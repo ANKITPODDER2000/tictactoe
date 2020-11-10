@@ -1,4 +1,7 @@
 # TIC TAC TOE(Using AI)
-  >> 1. Using Randomize Algorithm
-  >> 2.Algo used : MAXMIN Algorithm
-  >> 1Player Game !
+## Algorithm : 
+>>  1. Using Randomize Algorithm
+<br/>
+>>  2.Algo used : MAXMIN Algorithm
+<br/>
+>>  1Player Game !
