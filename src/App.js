@@ -79,6 +79,18 @@ function maxmin(board, symbol, reward, str) {
     }
 }
 
+function getMatrixSuccess(board) {
+    for (let i = 0; i < 3; i++){
+        if (board[i][0] === board[i][1] && board[i][1] === board[i][2] && board[i][0] !== '')
+            return [`${i}-0`, `${i}-1`, `${i}-2`];
+        if ((board[0][i] === board[1][i]) && (board[1][i] === board[2][i]) && board[0][i] !== '')
+            return [`0-${i}`, `1-${i}`, `2-${i}`];
+    }
+    if (board[0][0] === board[1][1] && board[1][1] === board[2][2] && board[0][0] !== '')
+        return ['0-0', '1-1', '2-2'];
+    if (board[0][2] === board[1][1] && board[1][1] === board[2][0] && board[1][1] !== '')
+        return ['0-2' , '1-1' , '2-0']
+}
 
 const style = {
     "@global": {
@@ -99,20 +111,22 @@ class App extends Component{
             board: this.makeInitialBoard(), // this is the board for the game!
             isStartPlay: false,              // it is used to determine whether play start or not ?
             playername: '',         //Player name , default player1 , but initialize with -> ''
-            playerStart: true,              // To determine whether player Starts the Game or AI
+            playerStart: false,              // To determine whether player Starts the Game or AI
             gameEnd : false,
-            result : ''
+            result: '',
+            currentPlayer: '',
+            arr : []
         }
         this.handleChange            = this.handleChange.bind(this);
         this.handleSelectChange      = this.handleSelectChange.bind(this);
         this.handleInputChange       = this.handleInputChange.bind(this);
         this.handleChangeplayerStart = this.handleChangeplayerStart.bind(this);
-        this.startPlay = this.startPlay.bind(this);
-        this.tdClick = this.tdClick.bind(this);
-        this.gameStart = this.gameStart.bind(this);
-        this.makeAImove = this.makeAImove.bind(this);
-        this.restart = this.restart.bind(this);
-        this.quit = this.quit.bind(this);
+        this.startPlay               = this.startPlay.bind(this);
+        this.tdClick                 = this.tdClick.bind(this);
+        this.gameStart               = this.gameStart.bind(this);
+        this.makeAImove              = this.makeAImove.bind(this);
+        this.restart                 = this.restart.bind(this);
+        this.quit                    = this.quit.bind(this);
     }
     quit() {
         this.setState({
@@ -126,9 +140,10 @@ class App extends Component{
             board: this.makeInitialBoard(), // this is the board for the game!
             isStartPlay: false,             // it is used to determine whether play start or not ?
             playername: '',                 //Player name , default player1 , but initialize with -> ''
-            playerStart: true,              // To determine whether player Starts the Game or AI
+            playerStart: false,              // To determine whether player Starts the Game or AI
             gameEnd : false,
-            result : ''
+            result: '',
+            arr : []
         })
     }
     makeAImove() {
@@ -179,6 +194,7 @@ class App extends Component{
         newBoard[pos.x][pos.y] = sym;
         this.setState({
             board: newBoard,
+            currentPlayer : this.state.playername,
             playerStart: false
         }, () => {
                 let ret = winner(this.state.board , sym);
@@ -186,7 +202,13 @@ class App extends Component{
                     this.setState({
                         gameEnd: true,
                         result : 'AI player'
-                    })
+                    }, () => {
+                            let arr = getMatrixSuccess(this.state.board);
+                            this.setState({
+                                arr : arr
+                            })
+                        }
+                    )
                 } else {
                     if (isTie(this.state.board)) {
                         this.setState({
@@ -205,7 +227,7 @@ class App extends Component{
     gameStart() {
         //console.log("GAME START!")
         if (this.state.playerStart === false) {
-            this.makeAImove();
+            setTimeout(()  =>  this.makeAImove() , Math.round(Math.random() * 1000))
         }
     }
     
@@ -218,6 +240,7 @@ class App extends Component{
         newBoard[x][y] = this.state.playerSymbol;
         this.setState({
             board: newBoard,
+            currentPlayer : 'AI Player',
             playerStart : false
         }, () => {
                 let ret = winner(this.state.board , this.state.playerSymbol);
@@ -225,7 +248,13 @@ class App extends Component{
                     this.setState({
                         result: this.state.playername,
                         gameEnd : true
-                    })
+                    }, () => {
+                            let arr = getMatrixSuccess(this.state.board);
+                            this.setState({
+                                arr : arr
+                            })
+                        }
+                    )
                 } else {
                     if (isTie(this.state.board)) {
                         this.setState({
@@ -233,7 +262,7 @@ class App extends Component{
                             gameEnd:true
                         })
                     } else {
-                        this.makeAImove();
+                        setTimeout(()  =>  this.makeAImove() , Math.round(Math.random() * 1000))
                     }
                 }
         })
@@ -262,6 +291,7 @@ class App extends Component{
         })
     }
     handleSelectChange(e) {
+        if (this.state.isStartPlay) return;
         this.setState({
             playerSymbol : e.target.value
         })
@@ -275,11 +305,13 @@ class App extends Component{
         if (this.state.playername === '') {
             this.setState({
                 isStartPlay: true,
-                playername : 'Player 1'
+                playername: 'Player 1',
+                currentPlayer : this.state.playerStart ? 'Player 1' : 'AI PLAYER!'
             } , this.gameStart)
         } else {
             this.setState({
-                isStartPlay : true
+                isStartPlay: true,
+                currentPlayer : this.state.playerStart ? this.state.playername : 'AI PLAYER!'
             } , this.gameStart)
         }
         
@@ -302,13 +334,15 @@ class App extends Component{
                     handleInputChange={this.handleInputChange}
                     playerStart={this.state.playerStart}
                     isStartPlay={this.state.isStartPlay}
+                    currentPlayer={this.state.currentPlayer}
                     startPlay={this.startPlay}
                     board={this.state.board}
                     tdClick={this.tdClick}
                     gameEnd={this.state.gameEnd}
                     result={this.state.result}
                     restart={this.restart}
-                    quit = {this.quit}
+                    quit={this.quit}
+                    arr = {this.state.arr}
                 />
             </div>
         )
