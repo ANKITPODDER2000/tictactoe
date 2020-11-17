@@ -136,15 +136,10 @@ const style = {
             fontFamily: 'Poppins, sans-serif',
             [Res('480')]: {
                 width: 'fit-content',
-                fontSize: '16px',
-                padding : '4px 8px'
+                fontSize: '11px',
+                padding: '4px 8px',
+                color : 'red'
             },
-            [Res('410')]: {
-                fontSize : '12px'
-            },
-            [Res('330')]: {
-                fontSize : '11px'
-            }
         }
     },
     btn: {
@@ -300,7 +295,7 @@ class Board extends Component {
                             </div>
                         </div>
                         <div className={classes.select}>
-                            <h2>Level : </h2>
+                            <h2>Level  : </h2>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
