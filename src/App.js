@@ -164,6 +164,7 @@ class App extends Component{
             gameEnd : false,
             result: '',
             currentPlayer: '',
+            level : 'easy',
             arr : []
         }
         this.handleChange            = this.handleChange.bind(this);
@@ -176,11 +177,17 @@ class App extends Component{
         this.makeAImove              = this.makeAImove.bind(this);
         this.restart                 = this.restart.bind(this);
         this.quit                    = this.quit.bind(this);
+        this.handleLevel             = this.handleLevel.bind(this);
     }
     quit() {
         this.setState({
             gameEnd : true,
             result : 'AI PLAYER'
+        })
+    }
+    handleLevel(e) {
+        this.setState({
+            level :  e.target.value
         })
     }
     restart() {
@@ -400,7 +407,9 @@ class App extends Component{
                     result={this.state.result}
                     restart={this.restart}
                     quit={this.quit}
-                    arr = {this.state.arr}
+                    arr={this.state.arr}
+                    level={this.state.level}
+                    handleLevel={this.handleLevel}
                 />
             </div>
         )

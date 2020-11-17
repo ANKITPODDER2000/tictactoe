@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Switch from '@material-ui/core/Switch';
 import { withStyles } from "@material-ui/styles";
 import Button from '@material-ui/core/Button';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import Res from "./Responsive";
 import "./Board.css"
 
@@ -152,6 +154,20 @@ const style = {
         [Res('330')]: {
             padding : '5px 10px'
         }
+    },
+    select: {
+        display: 'flex',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        marginTop: '15px',
+        '& h2': {
+            marginRight: '20px',
+            [Res('731')]: {
+                fontSize : '20px'
+            }
+        }
+        
     }
 }
 
@@ -266,20 +282,34 @@ class Board extends Component {
                             />
                         </div>
                         <div className={classes.bottomContainer}>
-                            <input type="text"
-                                placeholder="Please enter your name "
-                                value={this.props.playername}
-                                onChange={this.props.handleInputChange}
-                            />
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={this.props.startPlay}
-                                className={classes.btnStart}
-                                style={{fontFamily: 'Poppins, sans-serif'}}
+                            <div>
+                                <input type="text"
+                                    placeholder="Please enter your name "
+                                    value={this.props.playername}
+                                    onChange={this.props.handleInputChange}
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={this.props.startPlay}
+                                    className={classes.btnStart}
+                                    style={{fontFamily: 'Poppins, sans-serif'}}
+                                >
+                                    Start Play!
+                                </Button>
+                            </div>
+                        </div>
+                        <div className={classes.select}>
+                            <h2>Level : </h2>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={this.props.level}
+                                onChange={this.props.handleLevel}
                             >
-                                Start Play!
-                            </Button>
+                                <MenuItem value={'easy'}>Easy</MenuItem>
+                                <MenuItem value={'hard'}>Hard</MenuItem>
+                            </Select>
                         </div>
                     </div>
                 }
