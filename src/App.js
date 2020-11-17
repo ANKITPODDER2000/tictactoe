@@ -164,7 +164,7 @@ class App extends Component{
             gameEnd : false,
             result: '',
             currentPlayer: '',
-            level : 'easy',
+            level : window.localStorage.getItem('level') || 'easy',
             arr : []
         }
         this.handleChange            = this.handleChange.bind(this);
@@ -178,6 +178,7 @@ class App extends Component{
         this.restart                 = this.restart.bind(this);
         this.quit                    = this.quit.bind(this);
         this.handleLevel             = this.handleLevel.bind(this);
+        this.randomMove              = this.randomMove.bind(this);
     }
     quit() {
         this.setState({
@@ -188,7 +189,7 @@ class App extends Component{
     handleLevel(e) {
         this.setState({
             level :  e.target.value
-        })
+        } , () => window.localStorage.setItem('level' , this.state.level))
     }
     restart() {
         this.setState({                  // Determine theme of the game
@@ -202,6 +203,52 @@ class App extends Component{
             arr : []
         })
     }
+    //This is for the easy mood
+    randomMove() {
+        if (this.state.playerStart || this.state.result !== '' || this.state.gameEnd) return;
+        let x, y;
+        do {
+            x = Math.floor(Math.random() * 3);
+            y = Math.floor(Math.random() * 3);
+        } while (this.state.board[x][y] !== '');
+        let newBoard = this.state.board.slice();
+        let sym;
+        if (this.state.playerSymbol === 'X') sym = 'O';
+        else sym = 'X';
+        newBoard[x][y] = sym;
+        this.setState({
+            board: newBoard,
+            currentPlayer : this.state.playername,
+            playerStart: false
+        }, () => {
+                let ret = winner(this.state.board , sym);
+                if (ret) {
+                    this.setState({
+                        gameEnd: true,
+                        result : 'AI player'
+                    }, () => {
+                            let arr = getMatrixSuccess(this.state.board);
+                            this.setState({
+                                arr : arr
+                            })
+                        }
+                    )
+                } else {
+                    if (isTie(this.state.board)) {
+                        this.setState({
+                            gameEnd: true,
+                            result : 'tie'
+                        })
+                    } else {
+                        this.setState({
+                            playerStart : true
+                        })
+                    }
+                }
+        })
+
+    }
+    //This is for the hard mood
     makeAImove() {
         //console.log("COME2");
         //console.log(this.state.playerStart, this.state.result, this.state.gameEnd);
@@ -238,7 +285,7 @@ class App extends Component{
                         this.state.playerSymbol,
                         scores
                     );
-                    console.log(score);
+                    //console.log(score);
                     board[i][j] = '';
                     if (score > bestScore) {
                         bestScore = score;
@@ -288,7 +335,10 @@ class App extends Component{
     gameStart() {
         //console.log("GAME START!")
         if (this.state.playerStart === false) {
-            setTimeout(()  =>  this.makeAImove() , Math.round(Math.random() * 1000))
+            setTimeout(() => {
+                if (this.state.level === 'hard') this.makeAImove();
+                else this.randomMove();
+            },Math.round(Math.random() * 1000))
         }
     }
     
@@ -323,7 +373,10 @@ class App extends Component{
                             gameEnd:true
                         })
                     } else {
-                        setTimeout(()  =>  this.makeAImove() , Math.round(Math.random() * 1000))
+                        setTimeout(()  =>  {
+                            if (this.state.level === 'hard') this.makeAImove();
+                            else this.randomMove();
+                        } , Math.round(Math.random() * 1000))
                     }
                 }
         })
