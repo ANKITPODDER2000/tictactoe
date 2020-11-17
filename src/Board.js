@@ -305,7 +305,8 @@ class Board extends Component {
                                 onChange={this.props.handleLevel}
                             >
                                 <MenuItem value={'easy'}>Easy</MenuItem>
-                                <MenuItem value={'hard'}>Hard</MenuItem>
+                                <MenuItem value={'mid'}>Medium</MenuItem>
+                                <MenuItem value={'hard'}>Impossible</MenuItem>
                             </Select>
                         </div>
                     </div>

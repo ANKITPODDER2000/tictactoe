@@ -84,6 +84,44 @@ function checkWinner(board) {
         'max'
     )
  */
+function maxmin(board, symbol, reward, str) {
+    if( isTie(board)) return 0;
+    if (str === 'max') {
+        let bestScore = +Infinity;
+        for (let i = 0; i < 3; i++){
+            for (let j = 0; j < 3; j++){
+                if (board[i][j] === '') {
+                    board[i][j] = symbol.player;
+                    if (winner(board, symbol.player)) {
+                        board[i][j] = ''
+                        return -1;
+                    }
+                    let score = maxmin(board, symbol, reward, 'min');
+                    bestScore = min(score, bestScore);
+                    board[i][j] = ''
+                }
+            }
+        }
+        return bestScore;
+    } else {
+        let bestScore = -Infinity;
+        for (let i = 0; i < 3; i++){
+            for (let j = 0; j < 3; j++){
+                if (board[i][j] === '') {
+                    board[i][j] = symbol.ai;
+                    if (winner(board, symbol.ai)) {
+                        board[i][j] = ''
+                        return 1;
+                    }
+                    let score = maxmin(board, symbol, reward, 'min');
+                    bestScore = max(score, bestScore);
+                    board[i][j] = ''
+                }
+            }
+        }
+        return bestScore;
+    }
+}
 function minimax(board, depth, isMaximizing , ai , human , scores) {
     let result = checkWinner(board);
     if (result !== null) {
@@ -179,6 +217,7 @@ class App extends Component{
         this.quit                    = this.quit.bind(this);
         this.handleLevel             = this.handleLevel.bind(this);
         this.randomMove              = this.randomMove.bind(this);
+        this.makeWrongAImove         = this.makeWrongAImove.bind(this);
     }
     quit() {
         this.setState({
@@ -203,7 +242,7 @@ class App extends Component{
             arr : []
         })
     }
-    //This is for the easy mood
+    //This is for the easy mode
     randomMove() {
         if (this.state.playerStart || this.state.result !== '' || this.state.gameEnd) return;
         let x, y;
@@ -248,7 +287,71 @@ class App extends Component{
         })
 
     }
-    //This is for the hard mood
+    //This is for midium mode 
+    makeWrongAImove() {
+        if (this.state.playerStart || this.state.result !== '' || this.state.gameEnd) return;
+        let board = this.state.board;
+        let sym , score , pos , bestScore = -Infinity;
+        if (this.state.playerSymbol === 'X') sym = 'O';
+        else sym = 'X';
+        for (let i = 0; i < 3; i++){
+            for (let j = 0; j < 3; j++){
+                if (board[i][j] === '') {
+                    board[i][j] = sym;
+                    if (winner(board, sym))
+                    {
+                        score = 1;
+                    }
+                    else {
+                        score = maxmin(
+                            board,
+                            { ai: sym, player: this.state.playerSymbol },
+                            { ai: 1, player: -1, tie: 0 },
+                            'max'
+                        )
+                    }
+                    if (score > bestScore) {
+                        bestScore = score;
+                        pos = {x : i , y : j}
+                    }
+                    board[i][j] = '';
+                }
+            }
+        }
+        let newBoard = this.state.board;
+        newBoard[pos.x][pos.y] = sym;
+        this.setState({
+            board: newBoard,
+            currentPlayer : this.state.playername,
+            playerStart: false
+        }, () => {
+                let ret = winner(this.state.board , sym);
+                if (ret) {
+                    this.setState({
+                        gameEnd: true,
+                        result : 'AI player'
+                    }, () => {
+                            let arr = getMatrixSuccess(this.state.board);
+                            this.setState({
+                                arr : arr
+                            })
+                        }
+                    )
+                } else {
+                    if (isTie(this.state.board)) {
+                        this.setState({
+                            gameEnd: true,
+                            result : 'tie'
+                        })
+                    } else {
+                        this.setState({
+                            playerStart : true
+                        })
+                    }
+                }
+        })
+    }
+    //This is for the hard mode
     makeAImove() {
         //console.log("COME2");
         //console.log(this.state.playerStart, this.state.result, this.state.gameEnd);
@@ -337,6 +440,7 @@ class App extends Component{
         if (this.state.playerStart === false) {
             setTimeout(() => {
                 if (this.state.level === 'hard') this.makeAImove();
+                else if (this.state.level === 'mid') this.makeWrongAImove();
                 else this.randomMove();
             },Math.round(Math.random() * 1000))
         }
@@ -375,6 +479,7 @@ class App extends Component{
                     } else {
                         setTimeout(()  =>  {
                             if (this.state.level === 'hard') this.makeAImove();
+                            else if (this.state.level === 'mid') this.makeWrongAImove();
                             else this.randomMove();
                         } , Math.round(Math.random() * 1000))
                     }
