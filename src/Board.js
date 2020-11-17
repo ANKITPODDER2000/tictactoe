@@ -135,10 +135,12 @@ const style = {
             width: '250px',
             fontFamily: 'Poppins, sans-serif',
             [Res('480')]: {
-                width: 'fit-content',
-                fontSize: '11px',
+                fontSize: '12px',
                 padding: '4px 8px',
-                color : 'red'
+                width:'200px'
+            },
+            [Res('420')]: {
+                width:'160px'
             },
         }
     },
