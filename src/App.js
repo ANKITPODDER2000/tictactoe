@@ -225,7 +225,7 @@ class App extends Component{
                         this.state.playerSymbol,
                         scores
                     );
-                    //console.log(score);
+                    console.log(score);
                     board[i][j] = '';
                     if (score > bestScore) {
                         bestScore = score;
