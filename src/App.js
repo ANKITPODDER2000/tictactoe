@@ -147,14 +147,20 @@ const style = {
 
 class App extends Component{
     constructor(props) {
+        let isNight =
+            JSON.parse(window.localStorage.getItem('isNight')) === null
+                ?
+                true
+                :
+                JSON.parse(window.localStorage.getItem('isNight'));
         super(props);
         this.state = {
-            isNight: true,                  // Determine theme of the game
-            playerSymbol: 'X',              //Player symbol -> X / O
+            isNight:  isNight,                  // Determine theme of the game
+            playerSymbol: window.localStorage.getItem('playerSymbol') || 'X',              //Player symbol -> X / O
             board: this.makeInitialBoard(), // this is the board for the game!
             isStartPlay: false,              // it is used to determine whether play start or not ?
-            playername: '',         //Player name , default player1 , but initialize with -> ''
-            playerStart: false,              // To determine whether player Starts the Game or AI
+            playername: window.localStorage.getItem('playername') || 'Player 1',         //Player name , default player1 , but initialize with -> ''
+            playerStart: JSON.parse(window.localStorage.getItem('playerStart')) || false,              // To determine whether player Starts the Game or AI
             gameEnd : false,
             result: '',
             currentPlayer: '',
@@ -179,11 +185,11 @@ class App extends Component{
     }
     restart() {
         this.setState({                  // Determine theme of the game
-            playerSymbol: 'X',              //Player symbol -> X / O
+            playerSymbol: window.localStorage.getItem('playerSymbol'),              //Player symbol -> X / O
             board: this.makeInitialBoard(), // this is the board for the game!
             isStartPlay: false,             // it is used to determine whether play start or not ?
-            playername: '',                 //Player name , default player1 , but initialize with -> ''
-            playerStart: false,              // To determine whether player Starts the Game or AI
+            playername: window.localStorage.getItem('playername'),                 //Player name , default player1 , but initialize with -> ''
+            playerStart: JSON.parse(window.localStorage.getItem('playerStart')),              // To determine whether player Starts the Game or AI
             gameEnd : false,
             result: '',
             arr : []
@@ -331,18 +337,18 @@ class App extends Component{
     handleChange() {
         this.setState({
             isNight : !this.state.isNight
-        })
+        } , () => window.localStorage.setItem('isNight' , JSON.stringify(this.state.isNight)))
     }
     handleChangeplayerStart(e) {
         this.setState({
             playerStart : !this.state.playerStart
-        })
+        } , () => window.localStorage.setItem('playerStart' , JSON.stringify(this.state.playerStart)))
     }
     handleSelectChange(e) {
         if (this.state.isStartPlay) return;
         this.setState({
             playerSymbol : e.target.value
-        })
+        } , () => window.localStorage.setItem('playerSymbol' , this.state.playerSymbol))
     }
     handleInputChange(e) {
         this.setState({
@@ -350,7 +356,11 @@ class App extends Component{
         })
     }
     startPlay() {
+        window.localStorage.setItem('playername', this.state.playername);
+        window.localStorage.setItem('playerSymbol', this.state.playerSymbol);
+        window.localStorage.setItem('isNight' , JSON.stringify(this.state.isNight));
         if (this.state.playername === '') {
+            window.localStorage.setItem('playername', 'Player 1');
             this.setState({
                 isStartPlay: true,
                 playername: 'Player 1',
